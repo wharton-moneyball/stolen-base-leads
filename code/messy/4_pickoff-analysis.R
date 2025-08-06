@@ -36,6 +36,10 @@ non_pickoff_sampled <- non_pickoff %>% sample_frac(sample_frac)
 leadsab_final <- bind_rows(pickoff, non_pickoff_sampled) %>%
   select(-rowid)
 
+# Save pickoff analysis datasets
+write.csv(leadsab, "data/processed/leads_at_bat_level.csv", row.names = FALSE)
+write.csv(leadsab_final, "data/processed/leads_at_bat_balanced.csv", row.names = FALSE)
+
 view(leadsab)
 view(leadsab_final)
 

@@ -1,7 +1,7 @@
-nbpdata <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024netbasesprevented.csv")
-ipdata <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024inningspitched.csv")
-ssdata <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024sprintspeed.csv")
-ptdata <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024poptime.csv")
+nbpdata <- read.csv("data/raw/net-bases-prevented.csv")
+ipdata <- read.csv("data/raw/innings-pitched.csv")
+ssdata <- read.csv("data/raw/sprint-speed.csv")
+ptdata <- read.csv("data/raw/pop-time.csv")
 
 
 nbpdata <- nbpdata %>% 
@@ -32,6 +32,13 @@ ssdata <- ssdata %>%
 
 leadsnew <- leadsnew %>% 
   left_join(x = leadsnew, y = ssdata, by = c("Runner1B_ID" = "Runner1B_ID"))
+
+# Save processed datasets
+write.csv(nbpdata, "data/processed/net_bases_prevented_processed.csv", row.names = FALSE)
+write.csv(ipdata, "data/processed/pitcher_threat_metrics.csv", row.names = FALSE)
+write.csv(ptdata, "data/processed/catcher_poptime_metrics.csv", row.names = FALSE)
+write.csv(ssdata, "data/processed/sprint_speed_metrics.csv", row.names = FALSE)
+write.csv(leadsnew, "data/processed/leads_with_all_metrics.csv", row.names = FALSE)
 
 #view(nbpdata)
 #view(ipdata)

@@ -113,13 +113,18 @@ leads_summary <- leads1bWP %>%
   summarise(AvgLead = mean(PrimaryLead1B, na.rm = TRUE), .groups = "drop")
 
 # Plot
-ggplot(leads_summary, aes(x = threat_bin, y = AvgLead, group = pitch_hand, color = pitch_hand)) +
+threat_analysis_plot <- ggplot(leads_summary, aes(x = threat_bin, y = AvgLead, group = pitch_hand, color = pitch_hand)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
   scale_color_manual(name = "Pitcher Hand", values = c("R" = "red", "L" = "dodgerblue")) +
   labs(x = "Threat", y = "Average Primary Lead (ft)") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 14))
+
+# Save threat analysis plot
+ggsave("results/threat_by_pitcher_hand.png", threat_analysis_plot, width = 10, height = 6, dpi = 300)
+
+threat_analysis_plot
 
 # Compare lead distances by hand (cleaned version)
 leads_lefty <- leads1bWP %>% filter(pitch_hand == "L")

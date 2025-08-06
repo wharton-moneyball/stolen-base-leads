@@ -102,3 +102,23 @@ ggplot(leadTeamOnly, aes(x = reorder(RunnerTeam, TeamAvg), y = TeamAvg, fill = R
     plot.title = element_text(size = 18, face = "bold"),
     legend.position = "none"
   )
+
+# Save team analysis plot
+team_lead_error_plot <- ggplot(leadTeamOnly, aes(x = reorder(RunnerTeam, TeamAvg), y = TeamAvg, fill = RunnerTeam)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = team_colors) +
+  labs(
+    title = "Average Lead Error by Team",
+    x = "Team",
+    y = "Average Lead Error"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    plot.title = element_text(size = 18, face = "bold"),
+    legend.position = "none"
+  )
+
+ggsave("results/team_lead_error_analysis.png", team_lead_error_plot, width = 12, height = 8, dpi = 300)

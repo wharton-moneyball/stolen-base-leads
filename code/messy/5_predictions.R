@@ -14,5 +14,8 @@ leadsPreds <- leads1b %>%
   # Unpack the new columns
   unnest_wider(tmp)
 
+# Save prediction results
+write.csv(leadsPreds, "data/processed/leads_with_predictions.csv", row.names = FALSE)
+
 view(leadsPreds)
 

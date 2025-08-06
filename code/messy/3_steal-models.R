@@ -220,7 +220,7 @@ grid <- data.frame(
 )
 #grid$lead_surge <- pmax(grid$PrimaryLead1B - 18, 0)
 grid$pred <- predict(xThrowOverModel, newdata = grid, type = "response")
-ggplot(leadsnewer1b, aes(x = PrimaryLead1B, y = pickoffthrow)) +
+pickoff_throw_plot <- ggplot(leadsnewer1b, aes(x = PrimaryLead1B, y = pickoffthrow)) +
   geom_jitter(height = 0.02, width = 0, alpha = 0.3, color = "gray40") +
   geom_line(data = grid, aes(x = PrimaryLead1B, y = pred), color = "red", size = 1.2) +
   labs(
@@ -229,4 +229,9 @@ ggplot(leadsnewer1b, aes(x = PrimaryLead1B, y = pickoffthrow)) +
     title = "Pickoff Throw Probability vs. Lead (Threat, Sprint Speed Fixed)"
   ) +
   theme_minimal(base_size = 15)
+
+# Save plots from steal models analysis
+ggsave("results/pickoff_throw_model.png", pickoff_throw_plot, width = 10, height = 6, dpi = 300)
+
+pickoff_throw_plot
 

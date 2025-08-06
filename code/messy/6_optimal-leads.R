@@ -206,3 +206,48 @@ mean_leadchange
       y = "Count",
       title = "Lead Error on SB attempts"
     )
+
+# Save plots from optimal leads analysis
+actual_vs_optimal_plot <- ggplot(leads1bsample, aes(x = actualxRuns, y = optimalxRuns, color = recommendation)) +
+  geom_point(size = 2, alpha = 0.8) +
+  geom_abline(slope = 1, intercept = 0, color = "gray", lty = "dashed", size = 1.2) +
+  coord_fixed(ratio = 1) +
+  scale_color_manual(values = c("Stay" = "red", "Steal" = "forestgreen")) +
+  labs(
+    x = "xRuns (Actual)",
+    y = "xRuns (Optimal)",
+    color = "Recommendation",
+    title = "Actual vs. Optimal  - Sample of 100"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(legend.position = "top")
+
+lead_error_plot <- ggplot(leadsnew1b %>% filter(SB1 == 1), aes(x = leadChange)) +
+  geom_histogram(
+    fill = "#40b8c4", 
+    color = "black",      
+    bins = 30               
+  ) +
+  geom_vline(
+    xintercept = mean_leadchange,
+    color = "red",
+    size = 2
+  ) +
+  geom_text(
+    x = 1.2,
+    y = 265,
+    label = paste0("Mean: ", round(mean_leadchange, 2)),
+    color = "red",
+    vjust = -0.5,
+    fontface = "bold",
+    size = 5
+  ) +
+  theme_minimal(base_size = 15) +
+  labs(
+    x = "Error: Optimal Lead - Actual Lead (ft)",
+    y = "Count",
+    title = "Lead Error on SB attempts"
+  )
+
+ggsave("results/actual_vs_optimal_sample.png", actual_vs_optimal_plot, width = 10, height = 8, dpi = 300)
+ggsave("results/steal_lead_error_distribution.png", lead_error_plot, width = 10, height = 6, dpi = 300)

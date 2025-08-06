@@ -6,12 +6,12 @@ library(ggpubr)
 library(splines)
 
 
-leadsnew <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024_Lead_Distances_v2.csv")
+leadsnew <- read.csv("data/raw/lead-distances.csv")
 
 
 
 # BP/IP pitcher metric , BP comes from statcast
-leadsf <- leads %>% 
+leadsf <- leadsnew %>% 
   select(-Pitcher.y, -Catcher.y, -popcount) %>% 
   mutate(Pitcher = Pitcher.x, Catcher = Catcher.x) %>% 
   select(-Pitcher.x, -Catcher.x)
@@ -43,10 +43,16 @@ newplayerleads1b <- (filter(leads1b, !is.na(PrimaryLead1B))) %>%
     filter(n() >= 15) %>% 
     slice_head(n = 1)
   ungroup()
+
+# Save processed datasets
+write.csv(leadsf, "data/processed/leads_with_metrics.csv", row.names = FALSE)
+write.csv(leads1b, "data/processed/leads_1b_filtered.csv", row.names = FALSE)
+write.csv(playerleads1b, "data/processed/player_leads_1b.csv", row.names = FALSE)
+write.csv(newplayerleads1b, "data/processed/new_player_leads_1b.csv", row.names = FALSE)
   
 ############### EXTRA ###############
   
-#leads <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024_Lead_Distances.csv")
+#leads <- read.csv("data/raw/lead-distances.csv")
   #view(leads)
   #view(leadsnew)
   #view(leadsf)

@@ -176,6 +176,17 @@ plot7 <- ggplot(leadsnew1b %>% filter(SB1 == 1), aes(x = leadChange)) +
 ### examples + plots
 
 doPlot(4.03, 2.09, 30) # the one from presentation
+
+# Save plots to results folder
+ggsave("results/lead_histogram.png", plot1, width = 10, height = 6, dpi = 300)
+ggsave("results/steal_attempts_by_lead.png", plot2, width = 10, height = 6, dpi = 300)
+ggsave("results/player_average_leads.png", plot3, width = 10, height = 6, dpi = 300)
+ggsave("results/pitcher_threat_distribution.png", plot4, width = 10, height = 6, dpi = 300)
+ggsave("results/lead_vs_sprint_speed.png", plot5, width = 10, height = 6, dpi = 300)
+ggsave("results/actual_vs_optimal_xruns.png", plot6, width = 10, height = 6, dpi = 300)
+ggsave("results/steal_lead_error_histogram.png", plot7, width = 10, height = 6, dpi = 300)
+
+# Display plots
 plot1
 plot2
 plot3

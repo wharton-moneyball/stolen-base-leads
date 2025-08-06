@@ -8,19 +8,19 @@ library(splines)
 ### Read in data (Replace with your own file path)
 
 #leadsnew: play-level lead distance data. here "play" means pitch / pickoff att, designated by Play col
-leadsnew <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024_Lead_Distances_v2.csv")
+leadsnew <- read.csv("data/raw/lead-distances.csv")
 
 #Net Bases Prevented data from Savant (player-level)
-nbpdata <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024netbasesprevented.csv")
+nbpdata <- read.csv("data/raw/net-bases-prevented.csv")
 
 #Innings Pitched data from Savant (player-level)
-ipdata <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024inningspitched.csv")
+ipdata <- read.csv("data/raw/innings-pitched.csv")
 
 #Sprint Speed data from Savant (player-level)
-ssdata <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024sprintspeed.csv")
+ssdata <- read.csv("data/raw/sprint-speed.csv")
 
 #Catcher pop time data from Savant (player-level)
-ptdata <- read.csv("C:\\Users\\jackw\\projects\\Moneyball\\data\\2024poptime.csv")
+ptdata <- read.csv("data/raw/pop-time.csv")
 
 ### Filter and left_join Baseball Savant data into leadsnew
 
@@ -196,3 +196,8 @@ select(-optimal)
 
 # extra analysis to do: what % of situations is it best to run given real lead? given optimal lead?
 # 72% // 86%
+
+# Save all key processed datasets from full project
+write.csv(leadsnew, "data/processed/full_leads_with_all_metrics.csv", row.names = FALSE)
+write.csv(leadsnew1b, "data/processed/full_leads_1b_final.csv", row.names = FALSE)
+write.csv(leadsnewer1b, "data/processed/full_leads_1b_filtered_final.csv", row.names = FALSE)

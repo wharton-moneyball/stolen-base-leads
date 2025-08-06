@@ -50,7 +50,14 @@ plot2 <- ggplot(subset(leads1b, SB1 == 1 | CS1 == 1)) +
         legend.title = element_text(size = 10),
         legend.text = element_text(size = 9))
 plot2
-ggarrange(plot1, plot2, ncol = 2, nrow = 1)
+combined_plot <- ggarrange(plot1, plot2, ncol = 2, nrow = 1)
+
+# Save plots to results folder
+ggsave("results/messy_lead_histogram.png", plot1, width = 8, height = 6, dpi = 300)
+ggsave("results/messy_steal_attempts.png", plot2, width = 8, height = 6, dpi = 300)
+ggsave("results/messy_combined_lead_plots.png", combined_plot, width = 16, height = 6, dpi = 300)
+
+combined_plot
 
 sum(leadsf$SB1)
 
@@ -94,5 +101,13 @@ plot5 <- ggplot(newplayerleads1b, aes(x = sprint_speed, y = playeravg1Blead)) +
 cor(newplayerleads1b$sprint_speed, newplayerleads1b$playeravg1Blead, use = "complete.obs")
 # r = 0.54 r^2 = 0.29
 # Dan z score = 5.6
+
+# Save additional plots
+ggsave("results/messy_player_leads.png", plot3, width = 8, height = 6, dpi = 300)
+ggsave("results/messy_pitcher_threat.png", plot4, width = 8, height = 6, dpi = 300)
+ggsave("results/messy_lead_vs_speed.png", plot5, width = 8, height = 6, dpi = 300)
+
+plot3
+plot4
 plot5
 

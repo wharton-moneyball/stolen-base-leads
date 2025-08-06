@@ -40,3 +40,9 @@ sum(leadsnew1b$PK1)
 
 leadsnewer1b <- leadsnew1b %>% 
   filter(!(PrimaryLead1B >= 18 & pickoffthrow == 0))
+
+# Save final processed datasets
+write.csv(leadsnewf, "data/processed/leads_final_formatted.csv", row.names = FALSE)
+write.csv(leadsnew1b, "data/processed/leads_1b_final.csv", row.names = FALSE)
+write.csv(leads1bpkthrow, "data/processed/leads_pickoff_throws.csv", row.names = FALSE)
+write.csv(leadsnewer1b, "data/processed/leads_1b_filtered_final.csv", row.names = FALSE)
