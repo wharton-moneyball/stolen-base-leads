@@ -15,3 +15,4 @@ leadsPreds <- leads1b %>%
   unnest_wider(tmp)
 
 view(leadsPreds)
+
