@@ -12,8 +12,8 @@ data
 #############
 
 
+# finder file
 *.DS_Store
-.RDataTmp*
 
 
 ##############
