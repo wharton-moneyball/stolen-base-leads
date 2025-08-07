@@ -191,8 +191,8 @@ leadsnew1b <- leadsnew1b %>%
   ) %>%
   ungroup() %>%
   mutate(recommendation = if_else(optimalxRuns > 0, "Steal", "Stay"),
-         leadChange = optimalLead1B - PrimaryLead1B)
-select(-optimal)
+         leadChange = optimalLead1B - PrimaryLead1B) %>%
+  select(-optimal)
 
 # extra analysis to do: what % of situations is it best to run given real lead? given optimal lead?
 # 72% // 86%
