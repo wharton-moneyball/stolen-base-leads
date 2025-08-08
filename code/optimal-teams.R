@@ -7,15 +7,14 @@ library(ggplot2)
 # =========================
 
 # Read in dataset containing actual and optimal primary leads + expected run values
-leadoptimal <- read_csv("data/processed/full_leads_1b_filtered_final.csv")
+leadoptimal <- read_csv("data/processed/full_leads_1b_final.csv")
 
 # Select relevant columns and reorder them for easier reference
 leadoptimal <- leadoptimal %>%  
   select(
     Date, Home, Away, Play, Inning, TopBottom,
     Runner1B, PrimaryLead1B, sprint_speed,
-    actualxRuns, optimal.PrimaryLead1B, optimal.xRuns,
-    optimalLead1B, optimalxRuns,
+    actualxRuns, optimalLead1B, optimalxRuns,
     recommendation, leadChange,
     SB1, CS1, PK1, Pitcher, pitch_hand, Threat,
     Catcher, poptime, outs, Balls, Strikes,
@@ -33,8 +32,8 @@ colnames(leadoptimal)
 leadTeam <- leadoptimal %>%
   select(Date, Home, Play, Away, TopBottom, Runner1B, SB1, CS1, PK1, leadChange)
 
-# Inspect structure (optional)
-view(leadTeam)
+# Inspect structure
+# view(leadTeam)
 
 # Add team info and limit to pickoff or steal attempt plays
 leadTeam <- leadTeam %>%
@@ -50,8 +49,8 @@ leadTeam <- leadTeam %>%
   # Keep rows where a pickoff occurred or a steal attempt was made
   filter(Play == "Pickoff" | SBAttempts == 1)
 
-# Inspect cleaned team-level data (optional)
-view(leadTeam)
+# Inspect cleaned team-level data
+# view(leadTeam)
 
 # Compute average lead change error by team
 leadTeam <- leadTeam %>% 
@@ -66,8 +65,8 @@ leadTeam <- leadTeam %>%
 leadTeamOnly <- leadTeam %>% 
   select(RunnerTeam, TeamAvg)
 
-# Optional view
-view(leadTeamOnly)
+# View final team data
+# view(leadTeamOnly)
 
 # =========================
 # 3. PLOT: AVERAGE LEAD ERROR BY TEAM
@@ -86,22 +85,22 @@ team_colors <- c(
 )
 
 # Create bar chart showing average lead error per team
-ggplot(leadTeamOnly, aes(x = reorder(RunnerTeam, TeamAvg), y = TeamAvg, fill = RunnerTeam)) +
-  geom_bar(stat = "identity", color = "black") +
-  scale_fill_manual(values = team_colors) +
-  labs(
-    title = "Average Lead Error by Team",
-    x = "Team",
-    y = "Average Lead Error"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
-    axis.text.y = element_text(size = 12),
-    axis.title = element_text(size = 14),
-    plot.title = element_text(size = 18, face = "bold"),
-    legend.position = "none"
-  )
+# ggplot(leadTeamOnly, aes(x = reorder(RunnerTeam, TeamAvg), y = TeamAvg, fill = RunnerTeam)) +
+#   geom_bar(stat = "identity", color = "black") +
+#   scale_fill_manual(values = team_colors) +
+#   labs(
+#     title = "Average Lead Error by Team",
+#     x = "Team",
+#     y = "Average Lead Error"
+#   ) +
+#   theme_minimal() +
+#   theme(
+#     axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+#     axis.text.y = element_text(size = 12),
+#     axis.title = element_text(size = 14),
+#     plot.title = element_text(size = 18, face = "bold"),
+#     legend.position = "none"
+#   )
 
 # Save team analysis plot
 team_lead_error_plot <- ggplot(leadTeamOnly, aes(x = reorder(RunnerTeam, TeamAvg), y = TeamAvg, fill = RunnerTeam)) +

@@ -1,56 +1,38 @@
 # libraries
 library(tidyverse)
 
-#plots
-#extra dfs needed: newplayerleads1b, 
+# =========================
+# 1. LOAD DATA FROM OTHER SCRIPTS
+# =========================
 
-#doPlot function draws the curves for probs of outcomes and xRuns given situation (inputs thr, pop, spd)
-doPlot <- function(thr, pop, spd) {
-  lead_vec <- seq(0, 30, by = 0.1)
-  
-  results <- sapply(lead_vec, function(x) {
-    tmp <- get_prob(x, thr, pop, spd)
-    c(xRuns = tmp$xRuns, P_PK = tmp$P_PK, P_SB = tmp$P_SB, P_CS = tmp$P_CS)
-  })
-  
-  df <- data.frame(
-    PrimaryLead1B = lead_vec,
-    xRuns = results["xRuns", ],
-    P_PK = results["P_PK", ],
-    P_SB = results["P_SB", ],
-    P_CS = results["P_CS", ]
-  )
-  
-  library(tidyr)
-  df_long <- pivot_longer(df, cols = c(xRuns, P_PK, P_SB, P_CS),
-                          names_to = "metric", values_to = "value")
-  
-  # Custom colors for each metric
-  colormap <- c(
-    "xRuns" = "#0072B2",
-    "P_PK" = "#D55E00",
-    "P_SB" = "#009E73",
-    "P_CS" = "#E69F00"
-  )
-  
-  ggplot(df_long, aes(x = PrimaryLead1B, y = value, color = metric, group = metric)) +
-    geom_line(aes(size = (metric == "xRuns")), show.legend = TRUE) +
-    scale_size_manual(values = c("TRUE" = 2.3, "FALSE" = 1.1), guide = "none") +  # Thicc line for xRuns
-    scale_x_continuous(breaks = seq(0, 30, by = 5), limits = c(0, 30), expand = c(0, 0)) +
-    scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
-    scale_color_manual(
-      values = colormap,
-      labels = c("xRuns" = "xRuns", "P_PK" = "Pickoff Prob.", "P_SB" = "Stolen Base Prob.", "P_CS" = "Caught Stealing Prob.")
-    ) +
-    labs(
-      x = "Primary Lead at 1B (ft)", y = "", title = "Model Results: Given Situation"
-    ) +
-    theme_minimal(base_size = 14) +
-    theme(legend.position = "top", legend.title = element_blank())
-}
+# Load data processed by zach.R
+leadsnew1b <- read_csv("data/processed/full_leads_1b_final.csv")
 
-#remaining plots: just used in project
-plot1 <- ggplot(leadsnew1b) + #originally leads1b
+# Load pitcher data for threat analysis
+ipdata <- read_csv("data/raw/innings-pitched.csv") %>%
+  left_join(read_csv("data/raw/net-bases-prevented.csv"), by = "player_id") %>%
+  mutate(
+    netBP = net_attr_plus + net_attr_minus,
+    IP = round(as.numeric(p_formatted_ip), 0),
+    Threat = 100 * netBP / IP
+  ) %>%
+  filter(IP > 10)
+
+# Create player-level summary data for plotting
+newplayerleads1b <- leadsnew1b %>%
+  filter(!is.na(PrimaryLead1B)) %>%
+  group_by(Runner1B_ID) %>%
+  mutate(playeravg1Blead = mean(PrimaryLead1B)) %>%
+  filter(n() >= 15) %>% 
+  slice_head(n = 1) %>% 
+  ungroup()
+
+# =========================
+# 2. CREATE PLOTS
+# =========================
+
+# Create visualization plots
+plot1 <- ggplot(leadsnew1b) +
   geom_histogram(aes(x = PrimaryLead1B), 
                  binwidth = 1, 
                  fill = "lightgray", 
@@ -60,7 +42,7 @@ plot1 <- ggplot(leadsnew1b) + #originally leads1b
        title = "Primary Leads from 1B") +
   theme_minimal(base_size = 14)
 
-plot2 <- ggplot(subset(leadsnew1b, SB1 == 1 | CS1 == 1)) + #originally leads1b
+plot2 <- ggplot(subset(leadsnew1b, SB1 == 1 | CS1 == 1)) +
   geom_histogram(aes(x = PrimaryLead1B, fill = factor(CS1)), 
                  binwidth = 1, 
                  color = "black", 
@@ -78,12 +60,7 @@ plot2 <- ggplot(subset(leadsnew1b, SB1 == 1 | CS1 == 1)) + #originally leads1b
         legend.title = element_text(size = 10),
         legend.text = element_text(size = 9))
 
-newplayerleads1b <- (filter(leads1b, !is.na(PrimaryLead1B))) %>% 
-  group_by(Runner1B_ID) %>%
-  mutate(playeravg1Blead = mean(PrimaryLead1B)) %>%
-  filter(n() >= 15) %>% 
-  slice_head(n = 1) %>% 
-ungroup()
+
 
 plot3 <- ggplot(newplayerleads1b) +
   geom_histogram(aes(x = playeravg1Blead), 
@@ -116,20 +93,9 @@ plot5 <- ggplot(newplayerleads1b, aes(x = sprint_speed, y = playeravg1Blead)) +
   ) +
   theme_minimal(base_size = 14)
 
+# Create sample for optimal vs actual analysis
 leads1bsample <- leadsnew1b[sample(nrow(leadsnew1b), 100),] %>%
-  rowwise() %>%
-  mutate(
-    actualxRuns = get_prob(PrimaryLead1B, Threat, poptime, sprint_speed)$xRuns,
-    optimal = get_optimal_lead(Threat, poptime, sprint_speed)
-  ) %>%
-  mutate(
-    optimalLead1B = optimal$PrimaryLead1B,
-    optimalxRuns = optimal$xRuns
-  ) %>%
-  ungroup() %>%
-  mutate(recommendation = if_else(optimalxRuns > 0, "Steal", "Stay"),
-         leadChange = optimalLead1B - PrimaryLead1B) %>% 
-select(-optimal)
+  mutate(recommendation = if_else(optimalxRuns > 0, "Steal", "Stay"))
 
 plot6 <- ggplot(leads1bsample, aes(x = actualxRuns, y = optimalxRuns, color = recommendation)) +
   geom_point(size = 2, alpha = 0.8) +
@@ -145,7 +111,7 @@ plot6 <- ggplot(leads1bsample, aes(x = actualxRuns, y = optimalxRuns, color = re
   theme_minimal(base_size = 15) +
   theme(legend.position = "top")
 
-mean_leadchange <- 1.75 #only to 2 decimal places, take mean of (leadsnew1b %>% filter(SB1 == 1))$leadChange for true
+mean_leadchange <- mean((leadsnew1b %>% filter(SB1 == 1))$leadChange, na.rm = TRUE)
 
 plot7 <- ggplot(leadsnew1b %>% filter(SB1 == 1), aes(x = leadChange)) +
   geom_histogram(
@@ -178,8 +144,6 @@ plot7 <- ggplot(leadsnew1b %>% filter(SB1 == 1), aes(x = leadChange)) +
 
 ### examples + plots
 
-doPlot(4.03, 2.09, 30) # the one from presentation
-
 # Save plots to results folder
 ggsave("results/lead_histogram.png", plot1, width = 10, height = 6, dpi = 300)
 ggsave("results/steal_attempts_by_lead.png", plot2, width = 10, height = 6, dpi = 300)
@@ -189,11 +153,4 @@ ggsave("results/lead_vs_sprint_speed.png", plot5, width = 10, height = 6, dpi = 
 ggsave("results/actual_vs_optimal_xruns.png", plot6, width = 10, height = 6, dpi = 300)
 ggsave("results/steal_lead_error_histogram.png", plot7, width = 10, height = 6, dpi = 300)
 
-# Display plots
-plot1
-plot2
-plot3
-plot4
-plot5
-plot6
-plot7
+# All plots saved via ggsave above

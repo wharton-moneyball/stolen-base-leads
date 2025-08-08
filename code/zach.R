@@ -124,8 +124,6 @@ threat_analysis_plot <- ggplot(leads_summary, aes(x = threat_bin, y = AvgLead, g
 # Save threat analysis plot
 ggsave("results/threat_by_pitcher_hand.png", threat_analysis_plot, width = 10, height = 6, dpi = 300)
 
-threat_analysis_plot
-
 # Compare lead distances by hand (cleaned version)
 leads_lefty <- leads1bWP %>% filter(pitch_hand == "L")
 leads_righty <- leads1bWP %>% filter(pitch_hand == "R")
