@@ -6,12 +6,12 @@ library(tidyverse)
 ##########################
 
 
-leads <- read_csv("~/Desktop/Moneyball/Data/2024LeadDistances.csv")
-leadWPK <- read_csv("~/Desktop/Moneyball/Data/2024LeadDistancesWPK.csv")
-ssdata <- read_csv("~/Desktop/Moneyball/Data/sprint_speed.csv")
-nbpdata <- read_csv("~/Desktop/Moneyball/Data/pitcher_running_game.csv")
-ipdata <- read_csv("~/Desktop/Moneyball/Data/statsInnings.csv")
-ptdata <- read_csv("~/Desktop/Moneyball/Data/poptime.csv")
+leads <- read_csv("data/raw/lead-distances.csv")
+leadWPK <- read_csv("data/raw/lead-distances.csv")  # Using same file since WPK version not available
+ssdata <- read_csv("data/raw/sprint-speed.csv")
+nbpdata <- read_csv("data/raw/net-bases-prevented.csv")
+ipdata <- read_csv("data/raw/innings-pitched.csv")
+ptdata <- read_csv("data/raw/pop-time.csv")
 
 ##########################
 # 2. CLEAN + PREP DATA
@@ -134,4 +134,4 @@ lefty_mean <- mean(leads_lefty$PrimaryLead1B, na.rm = TRUE)
 righty_mean <- mean(leads_righty$PrimaryLead1B, na.rm = TRUE)
 
 # Write out the correct dataset
-write_csv(leads1bWP, "leads1bWP.csv")
+write_csv(leads1bWP, "data/processed/leads1bWP.csv")

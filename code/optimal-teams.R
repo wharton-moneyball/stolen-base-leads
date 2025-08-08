@@ -7,7 +7,7 @@ library(ggplot2)
 # =========================
 
 # Read in dataset containing actual and optimal primary leads + expected run values
-leadoptimal <- read_csv("~/Desktop/Moneyball/Data/leadsoptimal.csv")
+leadoptimal <- read_csv("data/processed/full_leads_1b_filtered_final.csv")
 
 # Select relevant columns and reorder them for easier reference
 leadoptimal <- leadoptimal %>%  
