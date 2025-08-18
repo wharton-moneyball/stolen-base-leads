@@ -1,3 +1,4 @@
+# jp is showing how to use GitHub Desktop
 library(tidyverse)
 library(baseballr)
 library(purrr)
