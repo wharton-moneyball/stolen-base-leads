@@ -195,6 +195,36 @@ leadsnew1b <- leadsnew1b %>%
          leadChange = optimalLead1B - PrimaryLead1B) %>%
   select(-optimal)
 
+
+##grouping together the at-bats
+
+leads_with_ab <- leadsnew1b %>%
+  arrange(Date, Home, Away, Inning, TopBottom, outs, Balls, Strikes) %>%
+  group_by(Date, Home, Away) %>%
+  mutate(
+  # new PA if:
+  # 1) a pitch with 0-0 count,
+  # 2) OR a pickoff that occurs before the first pitch of the PA (0-0 count, no outs change)
+  is_new_ab = 
+    (Play == "Pitch" & Balls == 0 & Strikes == 0) |
+    (Play == "Pickoff" & Balls == 0 & Strikes == 0),
+  is_new_ab = replace_na(is_new_ab, FALSE),
+  ab_seq = cumsum(is_new_ab),
+  ab_id  = str_c(Date, Home, Away, Inning, TopBottom, ab_seq, sep = "-")
+)
+
+
+  leads_ab <- leads_with_ab %>%
+  group_by(
+    ab_id, Date, Home, Away, Inning, TopBottom,
+    PitcherID, Pitcher, CatcherID, Catcher, Runner1B_ID, Runner1B
+  ) %>%
+  summarise(
+    mean_lead = mean(PrimaryLead1B, na.rm = TRUE)
+  )
+
+
+
 # extra analysis to do: what % of situations is it best to run given real lead? given optimal lead?
 # 72% // 86%
 
