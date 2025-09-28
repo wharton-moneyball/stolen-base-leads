@@ -1,4 +1,3 @@
-# jp is showing how to use GitHub Desktop
 library(tidyverse)
 library(baseballr)
 library(purrr)
@@ -93,7 +92,7 @@ leads1bpkthrow <- leadsnew1b %>%
 leadsnewer1b <- leadsnew1b %>% 
   filter(!(PrimaryLead1B >= 18 & pickoffthrow == 0))
 
-### Models
+### Models (OLD)
 
 # (1) probability of successful SB on given pitch (NOT ASSUMING THE RUNNER GOES)
 xsbModelnew <- glm(SB1 ~ PrimaryLead1B + Threat + poptime + sprint_speed, 
@@ -110,6 +109,29 @@ xThrowOverModel <- glm(pickoffthrow ~ PrimaryLead1B + Threat,
 # (4) given a pickoff throw, probability it's successful given lead distance only
 xpksuccessModel <- glm(PK1 ~ PrimaryLead1B, 
                        family = binomial(link = "logit"), data = leads1bpkthrow)
+
+### Models (NEW)
+
+# Node 1: Pickoff attempt?  (all plays)
+leadsnew1b <- leadsnew1b %>% mutate(PO_y = as.integer(Play == "Pickoff"))
+m_PO <- glm(PO_y ~ PrimaryLead1B + Threat, family = binomial(), data = leadsnew1b)
+
+# Node 2: Pickoff success?  (pickoff plays only)
+m_PK_given_PO <- glm(PK1 ~ PrimaryLead1B + Threat, family = binomial(),
+                     data = subset(leadsnew1b, Play == "Pickoff"))
+
+# Node 3: Runner goes?  (pitch plays only). Note: DOES NOT DEPEND ON LEAD DIST BC WE ARE CHANGING THAT IN GAME
+leads_pitch <- subset(leadsnew1b, Play == "Pitch")
+leads_pitch$ATT_y <- as.integer(leads_pitch$SB1 == 1L | leads_pitch$CS1 == 1L)
+m_ATT_given_Pitch <- glm(ATT_y ~ Threat + poptime + sprint_speed,
+                         family = binomial(), data = leads_pitch)
+
+# Node 4: Safe at 2nd?  (attempted steals only)
+leads_attempt <- subset(leadsnew1b, SB1 == 1L | CS1 == 1L)
+leads_attempt$SB_y <- as.integer(leads_attempt$SB1 == 1L)
+m_SB_given_ATT <- glm(SB_y ~ PrimaryLead1B + Threat + poptime + sprint_speed,
+                      family = binomial(), data = leads_attempt)
+
 
 ### Functions: model output and optimization
 
@@ -140,12 +162,35 @@ get_prob <- function(PrimaryLead1B, Threat, poptime, sprint_speed) {
   P_SB <- (1 - xpk) * xsb_pct
   P_CS <- (1 - xpk) * xcs_pct
   xRuns <- 0.20 * P_SB - 0.45 * P_CS - 0.45 * P_PK
-    data.frame(
+  data.frame(
     P_PK = P_PK,
     P_SB = P_SB,
     P_CS = P_CS,
     xRuns = xRuns
   )
+}
+get_prob_new <- function(PrimaryLead1B, Threat, poptime, sprint_speed) {
+  #turn input into df
+  nd <- data.frame(
+    PrimaryLead1B = PrimaryLead1B,
+    Threat        = Threat,
+    poptime       = poptime,
+    sprint_speed  = sprint_speed
+  )
+  
+  #predictions
+  p_PO   <- as.numeric(predict(m_PO,              nd, type = "response"))  # P(pickoff attempt)
+  p_PKPO <- as.numeric(predict(m_PK_given_PO,     nd, type = "response"))  # P(PK | pickoff)
+  p_ATT  <- as.numeric(predict(m_ATT_given_Pitch, nd, type = "response"))  # P(attempt | pitch)
+  pi_SB  <- as.numeric(predict(m_SB_given_ATT,    nd, type = "response"))  # P(SB | attempt)
+  
+  #multiply probs according to laws of conditional probability
+  P_PK <- p_PO * p_PKPO
+  P_SB <- (1 - p_PO) * p_ATT * pi_SB
+  P_CS <- (1 - p_PO) * p_ATT * (1 - pi_SB)
+  
+  xRuns <- 0.20 * P_SB - 0.45 * P_CS - 0.45 * P_PK
+  data.frame(P_PK = P_PK, P_SB = P_SB, P_CS = P_CS, xRuns = xRuns)
 }
 #note on outcomes/scaling:
 #the model output probabilities xsb, xcs, xpk do not necessarily add to 1. (Because the models are independent and don't assume the runner intends to go) 
@@ -176,8 +221,36 @@ get_optimal_lead <- function(Threat, poptime, sprint_speed) {
     xRuns = opt$objective
   )
 }
+get_optimal_lead_new <- function(Threat, poptime, sprint_speed) {
+  xRuns_func <- function(PrimaryLead1B) {
+    get_prob_new(PrimaryLead1B, Threat, poptime, sprint_speed)$xRuns
+  }
+  opt <- optimize(xRuns_func, interval = c(0, 90), maximum = TRUE)
+  tibble::tibble(
+    PrimaryLead1B = round(opt$maximum, 2),
+    xRuns = opt$objective
+  )
+}
 
 ### Adding model predictions to leads data
+
+#SAMPLE.
+leadsnew1bSAMPLE <- leadsnew1b[sample(nrow(leadsnew1b), 30), ]
+
+leadsnew1bSAMPLE <- leadsnew1bSAMPLE %>%
+  rowwise() %>%
+  mutate(
+    actualxRunsNew = get_prob_new(PrimaryLead1B, Threat, poptime, sprint_speed)$xRuns,
+    optimalNew = get_optimal_lead_new(Threat, poptime, sprint_speed)
+  ) %>%
+  mutate(
+    optimalLead1BNew = optimalNew$PrimaryLead1B,
+    optimalxRunsNew = optimalNew$xRuns
+  ) %>%
+  ungroup() %>%
+  mutate(recommendation = if_else(optimalxRunsNew > 0, "Steal", "Stay"),
+         leadChange = optimalLead1BNew - PrimaryLead1B) %>%
+  select(-optimalNew)
 
 #warning: this takes a long time
 leadsnew1b <- leadsnew1b %>%
@@ -195,6 +268,21 @@ leadsnew1b <- leadsnew1b %>%
          leadChange = optimalLead1B - PrimaryLead1B) %>%
   select(-optimal)
 
+leadsnew1b <- leadsnew1b %>%
+  rowwise() %>%
+  mutate(
+    actualxRunsNew = get_prob_new(PrimaryLead1B, Threat, poptime, sprint_speed)$xRuns,
+    optimalNew = get_optimal_lead_new(Threat, poptime, sprint_speed)
+  ) %>%
+  mutate(
+    optimalLead1BNew = optimalNew$PrimaryLead1B,
+    optimalxRunsNew = optimalNew$xRuns
+  ) %>%
+  ungroup() %>%
+  mutate(recommendationNew = if_else(optimalxRunsNew > 0, "Steal", "Stay"),
+         leadChangeNew = optimalLead1BNew - PrimaryLead1B) %>%
+  select(-optimalNew)
+
 
 ##grouping together the at-bats
 
@@ -202,19 +290,19 @@ leads_with_ab <- leadsnew1b %>%
   arrange(Date, Home, Away, Inning, TopBottom, outs, Balls, Strikes) %>%
   group_by(Date, Home, Away) %>%
   mutate(
-  # new PA if:
-  # 1) a pitch with 0-0 count,
-  # 2) OR a pickoff that occurs before the first pitch of the PA (0-0 count, no outs change)
-  is_new_ab = 
-    (Play == "Pitch" & Balls == 0 & Strikes == 0) |
-    (Play == "Pickoff" & Balls == 0 & Strikes == 0),
-  is_new_ab = replace_na(is_new_ab, FALSE),
-  ab_seq = cumsum(is_new_ab),
-  ab_id  = str_c(Date, Home, Away, Inning, TopBottom, ab_seq, sep = "-")
-)
+    # new PA if:
+    # 1) a pitch with 0-0 count,
+    # 2) OR a pickoff that occurs before the first pitch of the PA (0-0 count, no outs change)
+    is_new_ab = 
+      (Play == "Pitch" & Balls == 0 & Strikes == 0) |
+      (Play == "Pickoff" & Balls == 0 & Strikes == 0),
+    is_new_ab = replace_na(is_new_ab, FALSE),
+    ab_seq = cumsum(is_new_ab),
+    ab_id  = str_c(Date, Home, Away, Inning, TopBottom, ab_seq, sep = "-")
+  )
 
 
-  leads_ab <- leads_with_ab %>%
+leads_ab <- leads_with_ab %>%
   group_by(
     ab_id, Date, Home, Away, Inning, TopBottom,
     PitcherID, Pitcher, CatcherID, Catcher, Runner1B_ID, Runner1B
@@ -224,10 +312,8 @@ leads_with_ab <- leadsnew1b %>%
   )
 
 
-
 # extra analysis to do: what % of situations is it best to run given real lead? given optimal lead?
 # 72% // 86%
-
 # Save all key processed datasets from full project
 write.csv(leadsnew, "data/processed/full_leads_with_all_metrics.csv", row.names = FALSE)
 write.csv(leadsnew1b, "data/processed/full_leads_1b_final.csv", row.names = FALSE)
