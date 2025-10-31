@@ -11,7 +11,7 @@ leadoptimal <- read_csv("full_leads_1b_final.csv")
 
 
 # Select relevant columns and reorder them for easier reference
-leadoptimal <- leadoptimal %>%  
+leadoptimal <- leadsnew1b %>%  
   select(
     Date, Home, Away, Play, Inning, TopBottom,
     Runner1B, PrimaryLead1B, sprint_speed,
@@ -22,7 +22,7 @@ leadoptimal <- leadoptimal %>%
     everything()
   )
 
-# View column names (optional step to confirm structure)
+# View column nleadsnew1b# View column names (optional step to confirm structure)
 colnames(leadoptimal)
 
 # =========================
