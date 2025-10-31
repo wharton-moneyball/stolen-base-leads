@@ -60,13 +60,13 @@
 
 In baseball, scouts traditionally evaluate five tools -- hitting for average, hitting for power, fielding, throwing, and speed. Among these, \emph{speed} is often underappreciated, yet it strongly shapes a player's impact on the base paths. Stolen bases are the most conspicuous expression of that impact.
 
-Historically, steals have waxed and waned with the run-scoring environment of the MLB. During the Deadball era (c. 1900--1920), home run rates were quite low and teams relied more on advancing runners to score. Many seasons saw clubs exceed 100 steals and leagues tally well over 1,000 steals combined \cite{McMurray2015Deadball}. As home runs rose from the 1930s through the 1950s, average team steals fell to roughly 39 per season \cite{BaseballReference1950}. Then from the 1960s to the 1980s, players like Lou Brock and Rickey Henderson brought base-stealing back into fashion, and Maury Wills's remarkable 1962 season (featuring 104 stolen bases) was a turning point in baserunning that influenced how opponents pitched and held runners on \cite{Vazzana2016MauryWills}.
+Historically, steals have waxed and waned with the run-scoring environment of the MLB. During the Deadball era (c. 1900--1920), home run rates were quite low and teams relied more on advancing runners to score. Many seasons saw clubs exceed 100 steals and leagues tally well over 1,000 steals combined \citep{McMurray2015Deadball}. As home runs rose from the 1930s through the 1950s, average team steals fell to roughly 39 per season \citep{BaseballReference1950}. Then from the 1960s to the 1980s, players like Lou Brock and Rickey Henderson brought base-stealing back into fashion, and Maury Wills's remarkable 1962 season (featuring 104 stolen bases) was a turning point in baserunning that influenced how opponents pitched and held runners on \citep{Vazzana2016MauryWills}.
 
 \subsection{Sabermetrics and Expected Runs}
 
-By the 1990s--2000s, \textbf{sabermetrics} reframed the value of the steal. Bill James argued that a steal must succeed about two-thirds of the time to break even -- a "rule of thumb" that recognizes outs as scarce resources and emphasizes efficiency over raw totals \cite{James2023Baserunning}. Building on this, \emph{linear weights} assign average run values to outcomes independent of specific context. On Baseball Savant, a successful steal is valued at +0.20 expected runs (or xRuns), while being caught stealing or picked off are -0.45 xRuns each \cite{BaseballSavantRunValueND}. These provide a consistent baseline for evaluation.
+By the 1990s--2000s, \textbf{sabermetrics} reframed the value of the steal. Bill James argued that a steal must succeed about two-thirds of the time to break even -- a "rule of thumb" that recognizes outs as scarce resources and emphasizes efficiency over raw totals \citep{James2023Baserunning}. Building on this, \emph{linear weights} assign average run values to outcomes independent of specific context. On Baseball Savant, a successful steal is valued at +0.20 expected runs (or xRuns), while being caught stealing or picked off are -0.45 xRuns each \citep{BaseballSavantRunValueND}. These provide a consistent baseline for evaluation.
 
-However, context still matters when deciding to steal a base. The \emph{run value} of a steal depends on the \emph{base-out state} (which bases are occupied $\times$ number of outs). Note that there are $2^3 \times 3 = 24$ possible such states. Sabermetrics defines the "value of a play" as the \emph{change in run expectancy} between states, and run expectancy tables (like Table \ref{tab:re24}) are frequently used to estimate this. According to Table \ref{tab:re24}, stealing second base with 0 outs and no one else on base is worth $1.068 - 0.831 = 0.237$ runs, while being caught stealing in the same situation is worth $0.243 - 0.831 = -0.588$ runs \cite{FanGraphsRE24ND}.
+However, context still matters when deciding to steal a base. The \emph{run value} of a steal depends on the \emph{base-out state} (which bases are occupied $\times$ number of outs). Note that there are $2^3 \times 3 = 24$ possible such states. Sabermetrics defines the "value of a play" as the \emph{change in run expectancy} between states, and run expectancy tables (like Table \ref{tab:re24}) are frequently used to estimate this. According to Table \ref{tab:re24}, stealing second base with 0 outs and no one else on base is worth $1.068 - 0.831 = 0.237$ runs, while being caught stealing in the same situation is worth $0.243 - 0.831 = -0.588$ runs \citep{FanGraphsRE24ND}.
 
 \begin{table}[htbp]
 \centering
@@ -88,18 +88,18 @@ $1\ 2\ 3$   & 2.282 & 1.520 & 0.736 \\
 \end{tabular}
 
 \vspace{0.25em}
-\footnotesize Example run expectancy table \cite{FanGraphsRE24ND}.
+\footnotesize Example run expectancy table \citep{FanGraphsRE24ND}.
 \end{table}
 
 \subsection{The Lead's Impact on Base Stealing}
 
 While speed is a key ingredient in stealing bases, the \emph{lead} a runner takes off first base critically shapes both \emph{steal success} and \emph{pickoff risk}. A larger lead shortens the distance to second if the runner goes, but it also invites (and increases the success of) pickoff attempts at first.
 
-This strategic dimension of stealing has been studied in game-theoretic terms. \cite{Turocy2014Theft} models the steal decision as a two-player inspection game between the runner and the defense, where the runner chooses whether to go and the defense allocates attention between the runner and the batter. The mixed-strategy equilibrium implies a near-linear relationship between attempt frequency and success rate, with validation over MLB play-by-play data from 1974--2011. However, the framework does not prescribe an \emph{optimal primary lead} nor incorporate pitcher- and catcher-specific skills at the micro level.
+This strategic dimension of stealing has been studied in game-theoretic terms. \citet{Turocy2014Theft} models the steal decision as a two-player inspection game between the runner and the defense, where the runner chooses whether to go and the defense allocates attention between the runner and the batter. The mixed-strategy equilibrium implies a near-linear relationship between attempt frequency and success rate, with validation over MLB play-by-play data from 1974--2011. However, the framework does not prescribe an \emph{optimal primary lead} nor incorporate pitcher- and catcher-specific skills at the micro level.
 
-A complementary physics approach examines the kinematics of a steal attempt. Using position–time and velocity–time profiles for a case study, \cite{Kagan2013StolenBasePhysics} parametrizes acceleration from first, slide deceleration, top speed, speed upon arrival, and the runner's lead distance. He finds that sprint speed and initial acceleration most strongly affect success, with comparatively modest effects attributed to the primary lead. This analysis, while insightful mechanically, only implicitly considers pickoff risk and is limited in its scope.
+A complementary physics approach examines the kinematics of a steal attempt. Using position–time and velocity–time profiles for a case study, \citet{Kagan2013StolenBasePhysics} parametrizes acceleration from first, slide deceleration, top speed, speed upon arrival, and the runner's lead distance. He finds that sprint speed and initial acceleration most strongly affect success, with comparatively modest effects attributed to the primary lead. This analysis, while insightful mechanically, only implicitly considers pickoff risk and is limited in its scope.
 
-Data-driven work using tracking-era measurements shows how player behavior and pitcher tendencies shape leads. \cite{Lindbergh2015Statcast} uses MLB data on primary/secondary leads and sprint speed, highlighting outliers (e.g., Jon Lester's reluctance to throw over, enabling larger leads; Ichiro Suzuki's larger-than-expected leads relative to speed) and noting a positive association between sprint speed and lead size. That study, however, does not jointly model runner, pitcher, and catcher pop time, nor does it connect the full decision sequence (pickoff attempt $\to$ pickoff success; steal attempt $\to$ steal success) to \emph{expected runs}.
+Data-driven work using tracking-era measurements shows how player behavior and pitcher tendencies shape leads. \citet{Lindbergh2015Statcast} uses MLB data on primary/secondary leads and sprint speed, highlighting outliers (e.g., Jon Lester's reluctance to throw over, enabling larger leads; Ichiro Suzuki's larger-than-expected leads relative to speed) and noting a positive association between sprint speed and lead size. That study, however, does not jointly model runner, pitcher, and catcher pop time, nor does it connect the full decision sequence (pickoff attempt $\to$ pickoff success; steal attempt $\to$ steal success) to \emph{expected runs}.
 
 \textbf{This study} extends existing literature by (i) modeling the baserunning decision sequence with a nested set of logistic regressions, (ii) incorporating runner sprint speed, pitcher hold ability (\emph{Threat}), and catcher pop time in the relevant stages, and (iii) optimizing \emph{primary lead distance} to maximize expected runs for the base state of a runner on first (second and third empty). In doing so, we jointly quantify the reward of a larger lead (higher steal probability) and its cost (higher pickoff probability) on a common expected-runs scale.
 
@@ -113,7 +113,7 @@ Our primary dataset, provided by MLB, comprises 2024 play-by-play data. It inclu
 \begin{itemize}
     \item Runner sprint speed, $s$ (in feet/second).
     \item Catcher pop time, $p$ (seconds): the average time it takes a catcher to throw the ball to second base after receiving a pitch
-    \item Pitcher "Threat," $\theta$ (per 100 IP): Baseball Savant's Net Bases Prevented \cite{BaseballSavantRunValueND} scaled to 100 innings pitched, $\theta = 100\,\frac{\mathrm{NBP}}{\mathrm{IP}}$; higher values indicate better control of the running game.
+    \item Pitcher "Threat," $\theta$ (per 100 IP): Baseball Savant's Net Bases Prevented \citep{BaseballSavantRunValueND} scaled to 100 innings pitched, $\theta = 100\,\frac{\mathrm{NBP}}{\mathrm{IP}}$; higher values indicate better control of the running game.
 \end{itemize}
 To evaluate the expected value of base-stealing outcomes, we used \emph{fixed linear weights} from Baseball Savant:
 \begin{equation}
@@ -280,7 +280,7 @@ Figure \ref{fig:implied_probs} displays the model-implied probabilities of SB, C
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{figures/pca.png}
-    \caption{Pete Crow-Armstrong on first base, Paul Skenes pitching, Yasmani Grandal (not seen) catching. \cite{CubsvPirates2024}}
+    \caption{Pete Crow-Armstrong on first base, Paul Skenes pitching, Yasmani Grandal (not seen) catching. \citep{CubsvPirates2024}}
     \label{fig:example_case}
 \end{figure}
 
